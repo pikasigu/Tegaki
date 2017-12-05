@@ -271,6 +271,7 @@
 
     //予測候補が辞書に含まれるか確認する
     //key:検索用key , num:prediction追加line
+    //辞書に該当がなければgoogle suggest APIで候補を出してみる
     function getPredition (key , num){
       if(key in wordPrediction == true){
         //辞書検索に当たった場合
@@ -300,14 +301,18 @@
           document.getElementById("input_b3b").style.display = "inline";
           document.getElementById("input_b3c").style.display = "inline";
         }
+      }else{
+        suggest(key , num);
       }
     }
+
 
 
 
     //ボタン押下後の動作
     function pushButton (name) {
       $("#input").append(name);
+      suggest(name);
       result="";
       document.getElementById("input_b1").style.display = "none";
       document.getElementById("input_b2").style.display = "none";
