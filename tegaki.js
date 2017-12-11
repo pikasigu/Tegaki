@@ -60,6 +60,9 @@
       } ]
     };
 
+    // 予測候補の配列
+    var Prediction_1,Prediction_2,Prediction_3;
+
     canvas.addEventListener("mousemove", function(e){
       //マウスが動いたら座標値を取得
       var rect = e.target.getBoundingClientRect();
@@ -270,39 +273,41 @@
     });
 
     //予測候補が辞書に含まれるか確認する
-    //key:検索用key , num:prediction追加line
-    //辞書に該当がなければgoogle suggest APIで候補を出してみる
+    //getDBでDBから文字列を取得する
+    /*
+    getPredition -> getDB -> putPrediction
+    */
+
+    //keyとnumを受け取って,投げる
     function getPredition (key , num){
-      if(key in wordPrediction == true){
-        //辞書検索に当たった場合
-        //辞書から候補の配列を取得
-        var pre_result = wordPrediction[key];
-        if(num == 1){
-          $('#input_b1a').text(pre_result[0]);
-          $('#input_b1b').text(pre_result[1]);
-          $('#input_b1c').text(pre_result[2]);
-          document.getElementById("input_b1a").style.display = "inline";
-          document.getElementById("input_b1b").style.display = "inline";
-          document.getElementById("input_b1c").style.display = "inline";
-        }
-        if (num == 2) {
-          $('#input_b2a').text(pre_result[0]);
-          $('#input_b2b').text(pre_result[1]);
-          $('#input_b2c').text(pre_result[2]);
-          document.getElementById("input_b2a").style.display = "inline";
-          document.getElementById("input_b2b").style.display = "inline";
-          document.getElementById("input_b2c").style.display = "inline";
-        }
-        if (num == 3) {
-          $('#input_b3a').text(pre_result[0]);
-          $('#input_b3b').text(pre_result[1]);
-          $('#input_b3c').text(pre_result[2]);
-          document.getElementById("input_b3a").style.display = "inline";
-          document.getElementById("input_b3b").style.display = "inline";
-          document.getElementById("input_b3c").style.display = "inline";
-        }
-      }else{
-        suggest(key , num);
+      getDB(key,num);
+    }
+
+    function putPredition (num){
+      if(num == 1){
+        $('#input_b1a').text(Prediction_1[1]);
+        $('#input_b1b').text(Prediction_1[2]);
+        $('#input_b1c').text(Prediction_1[3]);
+        document.getElementById("input_b1a").style.display = "inline";
+        document.getElementById("input_b1b").style.display = "inline";
+        document.getElementById("input_b1c").style.display = "inline";
+        console.log("success put Prediction : " + Prediction_1);
+      }
+      else if (num == 2) {
+        $('#input_b2a').text(Prediction_2[1]);
+        $('#input_b2b').text(Prediction_2[2]);
+        $('#input_b2c').text(Prediction_2[3]);
+        document.getElementById("input_b2a").style.display = "inline";
+        document.getElementById("input_b2b").style.display = "inline";
+        document.getElementById("input_b2c").style.display = "inline";
+      }
+      else if (num == 3) {
+        $('#input_b3a').text(Prediction_3[1]);
+        $('#input_b3b').text(Prediction_3[2]);
+        $('#input_b3c').text(Prediction_3[3]);
+        document.getElementById("input_b3a").style.display = "inline";
+        document.getElementById("input_b3b").style.display = "inline";
+        document.getElementById("input_b3c").style.display = "inline";
       }
     }
 

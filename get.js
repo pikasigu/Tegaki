@@ -10,14 +10,16 @@ name -> word1~3 を呼び出す
 name -> text1~3 を呼び出す
 */
 
-
-function getDB(name){
+//処理は中に書きたい
+function getDB(name,num){
 
     //jsondataはobjectがいいらしい
     //送るのはスクロールから得られた有力文字(単語)をnameで関数で受け取りpost
     var send_data = {
       name : name
     };
+
+    console.log(send_data);
 
 	// Ajax 通信の実行
 	$.ajax({
@@ -29,10 +31,25 @@ function getDB(name){
 
 			console.log('\nget success： ' + response.word1);
 
-      //受け取って配列に格納し,返す
-      var get_data = [response.name,response.word1];
-      //console.log(get_data[1]);
-      $("#result").append(get_data[1]);
+      //受け取って配列に格納する.
+      //返すと非同期通信関連の未解決でundefineで返してしまうので、できればこちらで処理したい.
+      var get_data = [response.name,response.word1,response.word2,response.word3];
+
+      //用意してある配列に入れ込む
+      //numで代入配列を管理
+      if(num == 1){
+        Prediction_1 = get_data;
+      }else if(num == 2){
+        Prediction_2 = get_data;
+      }else{
+        Prediction_3 = get_data;
+      }
+      putPredition(num);
+
+
+      //$("#result").append(get_data[1]);
+
+
 
 
 		},
