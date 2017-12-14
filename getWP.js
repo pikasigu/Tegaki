@@ -11,7 +11,7 @@ key -> text1~3 を呼び出す
 */
 
 //処理は中に書きたい
-function getDB_WP(key,num,cgi_num){
+function getDB_WP(key){
 
   var defer = new $.Deferred;
 
@@ -29,12 +29,16 @@ function getDB_WP(key,num,cgi_num){
 		url: 		'searchWP.php',
 		dataType: 	'json',
 		data: send_data,
-		success: function(response){	// 通信に成功した場合の処理
+		success: function(data){	// 通信に成功した場合の処理
+
+      defer.resolve(data);
 
       //undefined
 			/*if(typeof response === 'undefined'){
         console.log('\nget success： ' + response.word1);
       }*/
+
+      /*
 
       //console.log(response);
 
@@ -80,6 +84,7 @@ function getDB_WP(key,num,cgi_num){
           }
         });
       }
+      */
 
 
 
@@ -95,4 +100,5 @@ function getDB_WP(key,num,cgi_num){
 
 		}
 	});
+  return defer.promise();
 }

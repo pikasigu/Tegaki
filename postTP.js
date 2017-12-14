@@ -1,7 +1,7 @@
 /*
 tegaki.jsで入力選択されたものをpostするjs
 
-1.DB->WPには認識文字のDBを作成する.
+1.DB->TPには認識文字のDBを作成する.
 1文字が候補で2文字以上を選択した場合は1文字に対して2文字をDBに
 2文字以上であれば,1文字と対象文字に対してDBに
 
@@ -13,28 +13,21 @@ getで常にDBから予測候補は取ってあるのでそれを弄って送る
 次の文字が入力されるまで入力文字を保持しておいて,繋がるようにDBを作成
 */
 
-function postDB_TP(key,word){
-
-    //jsondataはobjectがいいらしい
-    var send_data = {
-      key : key,
-      word1 : word,
-      word2 : "",
-      word3 : "",
-    };
-
+function postDB_TP(send_data){
     //console.log("post : " + key + word);
+
+    //console.log(send_data);
 
 	// Ajax 通信の実行
 	$.ajax({
 		type: 		'POST',
-		url: 		'mkWP.php',
+		url: 		'mkTP.php',
 		dataType: 	'json',
 		data: send_data,
 		success: function(){	// 通信に成功した場合の処理
 
 			// アラートを出力（値が単一の場合）
-		 console.log("post success");
+		 console.log("post success" + send_data);
 
 
 		},
@@ -43,8 +36,59 @@ function postDB_TP(key,word){
 		},
 		error: function(XMLHttpRequest, textStatus, errorThrown) {	// 通信に失敗した場合の処理
 
-			alert('\n通信に失敗しました。\nXMLHttpRequest : ' + XMLHttpRequest.status + '\ntextStatus : ' + textStatus + '\nerrorThrown : ' + errorThrown.message +'\n');
+			//alert('\n通信に失敗しました。\nXMLHttpRequest : ' + XMLHttpRequest.status + '\ntextStatus : ' + textStatus + '\nerrorThrown : ' + errorThrown.message +'\n');
 
 		}
 	});
+}
+
+
+/* getした配列から辞書が複数になるように...(ry) */
+//よーするに辞書がダブらないように突っ込むためのなんか
+function post_TP(key,word,Prediction){
+  postDB_TP(checkDB_TP(key,word,Prediction));
+}
+
+//Prediction_*とダブっていないか確認する
+//ダブっていたらsend_dataの入れ方を変える
+//flgでPrediction_*を判断
+//Prediction_は配列だった...
+//send_dataを返す
+function checkDB_TP(key,word,Prediction){
+
+  //console.log(key + " :: " + word);
+
+  //keyに対応するのでここでobjを作る
+  //jsondataはobjectがいいらしい
+  var send_data = {
+    key : "",
+    text1 : "",
+    text2 : "",
+    text3 : "",
+  };
+
+  //spliceの削除先配列
+  var remove;
+
+  console.log(Prediction);
+
+
+    $.each(Prediction, function(i,val){
+      if(val === word){ //一致する
+        remove = Prediction.splice(i,1);
+      }
+    });
+    //辞書登録されていない単語,頭に突っ込めばいい
+    remove = Prediction.splice(1,0,word);
+    return fix_send_data(Prediction,send_data);
+}
+
+//配列を受け取ってsend_dataに詰め込む、send_dataを返したい
+//受け取るsend_dataにはkeyだけ入れてある
+function fix_send_data(Prediction,send_data){
+  send_data.key = Prediction[0];
+  send_data.text1 = Prediction[1];
+  send_data.text2 = Prediction[2];
+  send_data.text3 = Prediction[3];
+  return send_data;
 }

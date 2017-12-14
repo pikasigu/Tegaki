@@ -41,6 +41,9 @@
 
     var oldpost;
 
+    var Old_key = "";
+    var T_Prediction =[];
+
     // text yo be sent
     var text = {
       'app_version' : 0.4,
@@ -271,62 +274,105 @@
             { param: { key: result3 } }
           ];
 
-          var jqXHRList = [];
+          //console.log(requests);
+
+          $.when(
+            getDB_WP(requests[0].param.key),
+            getDB_WP(requests[1].param.key),
+            getDB_WP(requests[2].param.key))
+            .done(function(data_1,data_2,data_3){
+              if(data_1){
+                Prediction_1 = [data_1.W_key,data_1.word1,data_1.word2,data_1.word3];
+              }else{
+                Prediction_1 = [result1,"","",""];
+              }
+              if(data_2){
+                Prediction_2 = [data_2.W_key,data_2.word1,data_2.word2,data_2.word3];
+              }else{
+                Prediction_2 = [result2,"","",""];
+              }
+              if(data_3){
+                Prediction_3 = [data_3.W_key,data_3.word1,data_3.word2,data_3.word3];
+              }else{
+                Prediction_3 = [result3,"","",""];
+              }
+              //console.log(Prediction_1);
+              //console.log(Prediction_2);
+              //console.log(Prediction_3);
+              undefined_Preiction(Prediction_1,1,cgi_num);
+              undefined_Preiction(Prediction_2,2,cgi_num);
+              undefined_Preiction(Prediction_3,3,cgi_num);
+              //console.log(cgi_num);
+              //getCGI(cgi_num);
+              get_suggest(cgi_num);
+            });
 
 
 
+        }
 
-          for (var i = 0; i < requests.length; i++) {
-              jqXHRList.push($.ajax({ // $.ajaxの戻り値を配列に格納
-                  type: 		'POST',
-                  url:  'mkWP.php',
-                  data: requests[i].param,
-                  dataType: 'json'
-              }));
-          }
-
-
-          // $.when関数を利用する
-          // $.whenは可変長引数を取るので、apllyメソッドを利用して配列で渡せるようにする
-          // $.whenのコンテキスト(applyの第一引数)はjQueryである必要があるので $ を渡す
-          $.when.apply($, jqXHRList).done(function () {
-            var json = [];
-            var statuses = [];
-            var XHRResultList = [];
-            // 結果は仮引数に可変長で入る **順番は保証されている**
-            // 取り出すには arguments から取り出す
-            // さらにそれぞれには [data, textStatus, jqXHR] の配列になっている
-            for (var i = 0; i < arguments.length; i++) {
-              var result = arguments[i];
-              json.push(result[0]);
-              statuses.push(result[1]);
-              XHRResultList.push(result[3]);
+        function undefined_Preiction(get_data,num,cgi_num){ //Predictionの空の場所をobjに入れる
+          $.each(get_data, function(i,val){
+            //console.log(i + " : " + num + " :: " + val);
+            if(val === ""){ //undefinedであれば実行,値が既にあれば実行しない
+              if(i != 0){ //Prediction_*のkeyに突っ込む i:配列の番号,num:Predictionの数
+                if(num == 1){
+                  cgi_num.Prediction_1.push(i);
+                }else if(num == 2){
+                  cgi_num.Prediction_2.push(i);
+                }else{
+                  cgi_num.Prediction_3.push(i);
+                }
+              }
             }
-          });
-
-          console.log(arguments);
-
-
-
-          var myPromise = [
-            getDB_WP(result1,1,cgi_num),
-            getDB_WP(result2,2,cgi_num),
-            getDB_WP(result3,3,cgi_num)
-          ];
-
-          Promise.all(myPromise)
-          .then(function(){
-            //辞書取得を完了を確認してからCGI取得を行いたい
-            //Predictionを全て埋めてからputPreditionする.
-            //console.log(cgi_num);
-            //putPredition();
           });
         }
 
-        function getCGI(){ //undefineの(空欄)に予測候補(CGI)を詰める
-          //CGI();
+
+        function getCGI(cgi_num){ //undefineの(空欄)に予測候補(CGI)を詰める
+          $.when(
+            CGI(get_key(1)),
+            CGI(get_key(2)),
+            CGI(get_key(3)))
+            .done(function(data_1,data_2,data_3){
+              //console.log(cgi_num);
+              $.each(cgi_num.Prediction_1,function(i,val){
+                Prediction_1[val] = data_1[0][1][val-1];
+              });
+              $.each(cgi_num.Prediction_2,function(i,val){
+                Prediction_2[val] = data_2[0][1][val-1];
+              });
+              $.each(cgi_num.Prediction_3,function(i,val){
+                Prediction_3[val] = data_3[0][1][val-1];
+              });
+              putPredition();
+
+            });
           //getがundefinedであればgetCGIする.
-          putPredition(num);
+
+        }
+
+        function get_suggest(cgi_num){ //undefineの(空欄)に予測候補(CGI)を詰める
+          $.when(
+            suggest(get_key(1)),
+            suggest(get_key(2)),
+            suggest(get_key(3)))
+            .done(function(data_1,data_2,data_3){
+              //console.log(data_1);
+              $.each(cgi_num.Prediction_1,function(i,val){
+                Prediction_1[val] = data_1[1][val-1];
+              });
+              $.each(cgi_num.Prediction_2,function(i,val){
+                Prediction_2[val] = data_2[1][val-1];
+              });
+              $.each(cgi_num.Prediction_3,function(i,val){
+                Prediction_3[val] = data_3[1][val-1];
+              });
+              putPredition();
+
+            });
+          //getがundefinedであればgetCGIする.
+
         }
 
     //input用の候補本体をボタンに入力機能を追加
@@ -399,17 +445,17 @@
       }
     }
 
+    function get_prediction(flg){
+      if(flg == 1 || flg == 10){
+        return Prediction_1;
+      }else if(flg == 2 || flg == 20){
+        return Prediction_2;
+      }else{
+        return Prediction_3;
+      }
+    }
 
-
-    //ボタン押下後の動作
-    /* flgは辞書に押し込むためのFLG
-    *  WPへの登録は文字数が1文字以上かで動きを変える
-    *  num + 0:字本体なので1文字であれば登録は無し,2文字以上であれば登録
-    *  num:予測文字本体をkeyで登録
-    */
-    function pushButton (word,flg) {
-      $("#input").append(word);
-      post_WP(get_key(flg),word,flg);
+    function clear_Prediction(){
       document.getElementById("input_b1").style.display = "none";
       document.getElementById("input_b2").style.display = "none";
       document.getElementById("input_b3").style.display = "none";
@@ -428,24 +474,79 @@
       document.getElementById("input_b3a").style.display = "none";
       document.getElementById("input_b3b").style.display = "none";
       document.getElementById("input_b3c").style.display = "none";
-      //続く候補を表示する処理を以下に...
-      getTextPrediction(name);
+    }
+
+    //予測候補が辞書に含まれるか確認する
+    //getDBでDBから文字列を取得する
+    /*
+    getPredition -> getDB -> putPrediction
+    */
+    //keyとnumを受け取って,投げる
+    function get_TextPrediction (word){
+
+      $.when(
+        getDB_TP(word))
+        .done(function(data){
+          //console.log(data);
+          if(data){
+            T_Prediction = [data.T_key,data.text1,data.text2,data.text3];
+          }else{
+            T_Prediction = [word,"","",""];
+          }
+          console.log(T_Prediction);
+          $('#input_b1a').text(T_Prediction[1]);
+          $('#input_b1b').text(T_Prediction[2]);
+          $('#input_b1c').text(T_Prediction[3]);
+          document.getElementById("input_b1a").style.display = "inline";
+          document.getElementById("input_b1b").style.display = "inline";
+          document.getElementById("input_b1c").style.display = "inline";
+
+      });
+
+    }
+
+
+
+
+
+    //ボタン押下後の動作
+    /* flgは辞書に押し込むためのFLG
+    *  WPへの登録は文字数が1文字以上かで動きを変える
+    *  num + 0:字本体なので1文字であれば登録は無し,2文字以上であれば登録
+    *  num:予測文字本体をkeyで登録
+    */
+    function pushButton (word,flg) {
+      var Prediction_obj = {
+        Prediction_1: Prediction_1,
+        Prediction_2: Prediction_2,
+        Prediction_3: Prediction_3
+      }
+      $("#input").append(word);
+
+      post_WP(get_key(flg),word,flg,Prediction_obj);
+      clear_Prediction();
+
+      //console.log(word);
+      get_TextPrediction(word);
+
+      if(Old_key != ""){
+        post_TP(Old_key,word,T_Prediction);
+      }
+
+      Old_key = word;
+
+      $('#input_b2a').text("が");
+      $('#input_b2b').text("の");
+      $('#input_b2c').text("を");
+      document.getElementById("input_b2a").style.display = "inline";
+      document.getElementById("input_b2b").style.display = "inline";
+      document.getElementById("input_b2c").style.display = "inline";
 
     }
 
     //続く候補を提示するfunc
-    function getTextPrediction(key){
-      if(key in textPrediction == true){
-        //辞書検索に当たった場合
-        //辞書から候補の配列を取得
-        var pre_result = textPrediction[key];
-        $('#input_b1a').text(pre_result[0]);
-        $('#input_b1b').text(pre_result[1]);
-        $('#input_b1c').text(pre_result[2]);
-        document.getElementById("input_b1a").style.display = "inline";
-        document.getElementById("input_b1b").style.display = "inline";
-        document.getElementById("input_b1c").style.display = "inline";
-      }
+    function put_TextPrediction(Old_key,word,T_Prediction){
+      post_TP(Old_key,word);
       //検索に当てはまらなければ,助詞を提示する
       $('#input_b2a').text("が");
       $('#input_b2b').text("の");

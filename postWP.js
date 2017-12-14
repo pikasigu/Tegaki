@@ -45,18 +45,19 @@ function postDB_WP(send_data){
 
 /* getした配列から辞書が複数になるように...(ry) */
 //よーするに辞書がダブらないように突っ込むためのなんか
-function post_WP(key,word,flg){
+function post_WP(key,word,flg,Prediction_obj){
 
   //console.log(key + " : " + word);
+
 
   //FLGで条件分岐
   //key=key,word=入力文字列
   if(flg >5){ //認識字本体
     if(key.length != 1){ //文字数が多ければ一文字目をkeyにする
-      postDB_WP(checkDB_WP(key.slice(0,1),word,flg/10));
+      postDB_WP(checkDB_WP(key.slice(0,1),word,flg/10,Prediction_obj));
     } //1文字なら登録無し
   }else{ //予測候補を選択した場合
-    postDB_WP(checkDB_WP(key,word,flg));
+    postDB_WP(checkDB_WP(key,word,flg,Prediction_obj));
   }
 }
 
@@ -65,7 +66,7 @@ function post_WP(key,word,flg){
 //flgでPrediction_*を判断
 //Prediction_は配列だった...
 //send_dataを返す
-function checkDB_WP(key,word,flg){
+function checkDB_WP(key,word,flg,Prediction_obj){
 
   //console.log(key + " :: " + word);
 
@@ -84,32 +85,32 @@ function checkDB_WP(key,word,flg){
   //console.log(Prediction_1);
 
   if(flg == 1){
-    $.each(Prediction_1, function(i,val){
+    $.each(Prediction_obj.Prediction_1, function(i,val){
       if(val === word){ //一致する
-        remove = Prediction_1.splice(i,1);
+        remove = Prediction_obj.Prediction_1.splice(i,1);
       }
     });
     //辞書登録されていない単語,頭に突っ込めばいい
-    remove = Prediction_1.splice(1,0,word);
-    return fix_send_data(Prediction_1,send_data);
+    remove = Prediction_obj.Prediction_1.splice(1,0,word);
+    return fix_send_data(Prediction_obj.Prediction_1,send_data);
   }else if(flg == 2){
-    $.each(Prediction_2, function(i,val){
+    $.each(Prediction_obj.Prediction_2, function(i,val){
       if(val === word){ //一致する
-        remove = Prediction_2.splice(i,1).splice(1,0,word);
-        return fix_send_data(Prediction_2,send_data);
+        remove = Prediction_obj.Prediction_2.splice(i,1).splice(1,0,word);
+        return fix_send_data(Prediction_obj.Prediction_2,send_data);
       }
     });
-    remove = Prediction_2.splice(1,0,word);
-    return fix_send_data(Prediction_2,send_data);
+    remove = Prediction_obj.Prediction_2.splice(1,0,word);
+    return fix_send_data(Prediction_obj.Prediction_2,send_data);
   }else{
-    $.each(Prediction_3, function(i,val){
+    $.each(Prediction_obj.Prediction_3, function(i,val){
       if(val === word){ //一致する
-        remove = Prediction_3.splice(i,1).splice(1,0,word);
-        return fix_send_data(Prediction_3,send_data);
+        remove = Prediction_obj.Prediction_3.splice(i,1).splice(1,0,word);
+        return fix_send_data(Prediction_obj.Prediction_3,send_data);
       }
     });
-    remove = Prediction_3.splice(1,0,word);
-    return fix_send_data(Prediction_3,send_data);
+    remove = Prediction_obj.Prediction_3.splice(1,0,word);
+    return fix_send_data(Prediction_obj.Prediction_3,send_data);
   }
 
 }
