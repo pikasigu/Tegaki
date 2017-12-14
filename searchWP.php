@@ -5,7 +5,7 @@ DBからWPを引っ張り出して,予測候補を返す
 
 //ヘッダーの設定
 // POST値を取得して変数へ代入
-$name_data = filter_input(INPUT_POST, 'name');
+$key_data = filter_input(INPUT_POST, 'key');
 
 //DB処理を突っ込む
 //DB接続情報
@@ -17,8 +17,9 @@ try{
   //PDOインスタンス生成
   $pdo = new PDO($dsn,$username,$password);
 //SELECT文
-$sql = 'select * from WordPrediction where name ='.$name_data;
+$sql = "SELECT * FROM WordPrediction WHERE W_key = '$key_data'";
 $stmt = $pdo->query($sql);
+//echo $sql;
 $stmt -> execute(); //実行
 //recにfetchで取得
 $rec = $stmt->fetch(PDO::FETCH_ASSOC);

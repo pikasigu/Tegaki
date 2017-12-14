@@ -13,17 +13,17 @@ getで常にDBから予測候補は取ってあるのでそれを弄って送る
 次の文字が入力されるまで入力文字を保持しておいて,繋がるようにDBを作成
 */
 
-function postDB(name,word){
+function postDB_TP(key,word){
 
     //jsondataはobjectがいいらしい
     var send_data = {
-      name : name,
+      key : key,
       word1 : word,
       word2 : "",
       word3 : "",
     };
 
-    //console.log("post : " + name + word);
+    //console.log("post : " + key + word);
 
 	// Ajax 通信の実行
 	$.ajax({
