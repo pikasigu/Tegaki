@@ -44,6 +44,8 @@
     var Old_key = "";
     var T_Prediction =[];
 
+    var mode = "WP";
+
     // text yo be sent
     var text = {
       'app_version' : 0.4,
@@ -65,6 +67,8 @@
 
     // 予測候補の配列
     var Prediction_1,Prediction_2,Prediction_3;
+    var W_Prediction_1,W_Prediction_2,W_Prediction_3;
+
 
     canvas.addEventListener("mousemove", function(e){
       //マウスが動いたら座標値を取得
@@ -211,6 +215,7 @@
         dataType : 'json',
       }).done(function(json) {
         //console.log(json);
+        mode = "WP";
 
         //有力候補を上から3つ所持する
         result1 = json[1][0][1][0];
@@ -283,25 +288,31 @@
             .done(function(data_1,data_2,data_3){
               if(data_1){
                 Prediction_1 = [data_1.W_key,data_1.word1,data_1.word2,data_1.word3];
+                W_Prediction_1 = [data_1.W_key,data_1.word1,data_1.word2,data_1.word3];
               }else{
                 Prediction_1 = [result1,"","",""];
+                W_Prediction_1 = [result1,"","",""]
               }
               if(data_2){
                 Prediction_2 = [data_2.W_key,data_2.word1,data_2.word2,data_2.word3];
+                W_Prediction_2 = [data_2.W_key,data_2.word1,data_2.word2,data_2.word3];
               }else{
                 Prediction_2 = [result2,"","",""];
+                W_Prediction_2 = [result2,"","",""];
               }
               if(data_3){
                 Prediction_3 = [data_3.W_key,data_3.word1,data_3.word2,data_3.word3];
+                W_Prediction_3 = [data_3.W_key,data_3.word1,data_3.word2,data_3.word3];
               }else{
                 Prediction_3 = [result3,"","",""];
+                W_Prediction_3 = [result3,"","",""];
               }
               //console.log(Prediction_1);
               //console.log(Prediction_2);
               //console.log(Prediction_3);
-              undefined_Preiction(Prediction_1,1,cgi_num);
-              undefined_Preiction(Prediction_2,2,cgi_num);
-              undefined_Preiction(Prediction_3,3,cgi_num);
+              undefined_Preiction(W_Prediction_1,1,cgi_num);
+              undefined_Preiction(W_Prediction_2,2,cgi_num);
+              undefined_Preiction(W_Prediction_3,3,cgi_num);
               //console.log(cgi_num);
               //getCGI(cgi_num);
               get_suggest(cgi_num);
@@ -493,7 +504,7 @@
           }else{
             T_Prediction = [word,"","",""];
           }
-          console.log(T_Prediction);
+          //console.log(T_Prediction);
           $('#input_b1a').text(T_Prediction[1]);
           $('#input_b1b').text(T_Prediction[2]);
           $('#input_b1c').text(T_Prediction[3]);
@@ -516,14 +527,29 @@
     *  num:予測文字本体をkeyで登録
     */
     function pushButton (word,flg) {
-      var Prediction_obj = {
-        Prediction_1: Prediction_1,
-        Prediction_2: Prediction_2,
-        Prediction_3: Prediction_3
-      }
-      $("#input").append(word);
 
-      post_WP(get_key(flg),word,flg,Prediction_obj);
+      var Prediction_obj = {
+        Prediction: ""
+      }
+
+      
+
+      $("#input").append(word);
+      //console.log(Prediction_obj);
+
+
+      $.when(
+        getDB_WP(get_key(get_key(flg).slice(0,1))))
+        .done(function(data){
+          Prediction_obj.Prediction = data;
+          console.log(data);
+          if(mode == "WP"){
+            post_WP(get_key(flg),word,flg,Prediction_obj);
+            mode = "TP";
+          }
+        });
+
+
       clear_Prediction();
 
       //console.log(word);

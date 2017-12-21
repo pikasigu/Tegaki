@@ -16,7 +16,7 @@ getで常にDBから予測候補は取ってあるのでそれを弄って送る
 function postDB_WP(send_data){
     //console.log("post : " + key + word);
 
-    //console.log(send_data);
+    console.log(send_data);
 
 	// Ajax 通信の実行
 	$.ajax({
@@ -46,8 +46,11 @@ function postDB_WP(send_data){
 /* getした配列から辞書が複数になるように...(ry) */
 //よーするに辞書がダブらないように突っ込むためのなんか
 function post_WP(key,word,flg,Prediction_obj){
+  //console.log(Prediction_obj);
 
   //console.log(key + " : " + word);
+
+  console.log(key.slice(0,1));
 
 
   //FLGで条件分岐
@@ -57,7 +60,8 @@ function post_WP(key,word,flg,Prediction_obj){
       postDB_WP(checkDB_WP(key.slice(0,1),word,flg/10,Prediction_obj));
     } //1文字なら登録無し
   }else{ //予測候補を選択した場合
-    postDB_WP(checkDB_WP(key,word,flg,Prediction_obj));
+    postDB_WP(checkDB_WP(key.slice(0,1),word,flg,Prediction_obj));
+    //postDB_WP(checkDB_WP(key,word,flg,Prediction_obj));
   }
 }
 
@@ -73,7 +77,7 @@ function checkDB_WP(key,word,flg,Prediction_obj){
   //keyに対応するのでここでobjを作る
   //jsondataはobjectがいいらしい
   var send_data = {
-    key : "",
+    key : key,
     word1 : "",
     word2 : "",
     word3 : "",
@@ -85,32 +89,32 @@ function checkDB_WP(key,word,flg,Prediction_obj){
   //console.log(Prediction_1);
 
   if(flg == 1){
-    $.each(Prediction_obj.Prediction_1, function(i,val){
-      if(val === word){ //一致する
-        remove = Prediction_obj.Prediction_1.splice(i,1);
+    $.each(Prediction_obj.Prediction, function(i,val){
+      if(val === word && i != 0){ //一致する
+        remove = Prediction_obj.Prediction.splice(i,1);
       }
     });
     //辞書登録されていない単語,頭に突っ込めばいい
-    remove = Prediction_obj.Prediction_1.splice(1,0,word);
-    return fix_send_data(Prediction_obj.Prediction_1,send_data);
-  }else if(flg == 2){
-    $.each(Prediction_obj.Prediction_2, function(i,val){
-      if(val === word){ //一致する
-        remove = Prediction_obj.Prediction_2.splice(i,1).splice(1,0,word);
-        return fix_send_data(Prediction_obj.Prediction_2,send_data);
+    remove = Prediction_obj.Prediction.splice(1,0,word);
+    return fix_send_data(Prediction_obj.Prediction,send_data);
+  }else if(flg == 2 ){
+    $.each(Prediction_obj.Prediction, function(i,val){
+      if(val === word && i != 0){ //一致する
+        remove = Prediction_obj.Prediction.splice(i,1).splice(1,0,word);
+        return fix_send_data(Prediction_obj.Prediction,send_data);
       }
     });
-    remove = Prediction_obj.Prediction_2.splice(1,0,word);
-    return fix_send_data(Prediction_obj.Prediction_2,send_data);
+    remove = Prediction_obj.Prediction.splice(1,0,word);
+    return fix_send_data(Prediction_obj.Prediction,send_data);
   }else{
-    $.each(Prediction_obj.Prediction_3, function(i,val){
+    $.each(Prediction_obj.Prediction, function(i,val){
       if(val === word){ //一致する
-        remove = Prediction_obj.Prediction_3.splice(i,1).splice(1,0,word);
-        return fix_send_data(Prediction_obj.Prediction_3,send_data);
+        remove = Prediction_obj.Prediction.splice(i,1).splice(1,0,word);
+        return fix_send_data(Prediction_obj.Prediction,send_data);
       }
     });
-    remove = Prediction_obj.Prediction_3.splice(1,0,word);
-    return fix_send_data(Prediction_obj.Prediction_3,send_data);
+    remove = Prediction_obj.Prediction.splice(1,0,word);
+    return fix_send_data(Prediction_obj.Prediction,send_data);
   }
 
 }
@@ -118,9 +122,9 @@ function checkDB_WP(key,word,flg,Prediction_obj){
 //配列を受け取ってsend_dataに詰め込む、send_dataを返したい
 //受け取るsend_dataにはkeyだけ入れてある
 function fix_send_data(Prediction,send_data){
-  send_data.key = Prediction[0];
   send_data.word1 = Prediction[1];
   send_data.word2 = Prediction[2];
   send_data.word3 = Prediction[3];
+
   return send_data;
 }

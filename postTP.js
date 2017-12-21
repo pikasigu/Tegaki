@@ -13,21 +13,21 @@ getで常にDBから予測候補は取ってあるのでそれを弄って送る
 次の文字が入力されるまで入力文字を保持しておいて,繋がるようにDBを作成
 */
 
-function postDB_TP(send_data){
+function postDB_TP(send_TP){
     //console.log("post : " + key + word);
 
-    //console.log(send_data);
+    //console.log(send_TP);
 
 	// Ajax 通信の実行
 	$.ajax({
 		type: 		'POST',
 		url: 		'mkTP.php',
 		dataType: 	'json',
-		data: send_data,
+		data: send_TP,
 		success: function(){	// 通信に成功した場合の処理
 
 			// アラートを出力（値が単一の場合）
-		 console.log("post success" + send_data);
+		 console.log("post success" + send_TP);
 
 
 		},
@@ -50,17 +50,17 @@ function post_TP(key,word,Prediction){
 }
 
 //Prediction_*とダブっていないか確認する
-//ダブっていたらsend_dataの入れ方を変える
+//ダブっていたらsend_TPの入れ方を変える
 //flgでPrediction_*を判断
 //Prediction_は配列だった...
-//send_dataを返す
+//send_TPを返す
 function checkDB_TP(key,word,Prediction){
 
   //console.log(key + " :: " + word);
 
   //keyに対応するのでここでobjを作る
   //jsondataはobjectがいいらしい
-  var send_data = {
+  var send_TP = {
     key : "",
     text1 : "",
     text2 : "",
@@ -70,7 +70,6 @@ function checkDB_TP(key,word,Prediction){
   //spliceの削除先配列
   var remove;
 
-  console.log(Prediction);
 
 
     $.each(Prediction, function(i,val){
@@ -80,15 +79,15 @@ function checkDB_TP(key,word,Prediction){
     });
     //辞書登録されていない単語,頭に突っ込めばいい
     remove = Prediction.splice(1,0,word);
-    return fix_send_data(Prediction,send_data);
+    return fix_send_TP(Prediction,send_TP);
 }
 
-//配列を受け取ってsend_dataに詰め込む、send_dataを返したい
-//受け取るsend_dataにはkeyだけ入れてある
-function fix_send_data(Prediction,send_data){
-  send_data.key = Prediction[0];
-  send_data.text1 = Prediction[1];
-  send_data.text2 = Prediction[2];
-  send_data.text3 = Prediction[3];
-  return send_data;
+//配列を受け取ってsend_TPに詰め込む、send_TPを返したい
+//受け取るsend_TPにはkeyだけ入れてある
+function fix_send_TP(Prediction,send_TP){
+  send_TP.key = Prediction[0];
+  send_TP.text1 = Prediction[1];
+  send_TP.text2 = Prediction[2];
+  send_TP.text3 = Prediction[3];
+  return send_TP;
 }
