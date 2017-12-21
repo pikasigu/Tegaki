@@ -199,6 +199,7 @@
       result="";
       text.requests[0].ink = [];
       ctx.clearRect(0,0,canvas.width,canvas.height);
+      clear_Prediction();
     });
 
 
@@ -532,17 +533,21 @@
         Prediction: ""
       }
 
-      
+
 
       $("#input").append(word);
       //console.log(Prediction_obj);
 
 
       $.when(
-        getDB_WP(get_key(get_key(flg).slice(0,1))))
+        getDB_WP(get_key(flg).slice(0,1)))
         .done(function(data){
-          Prediction_obj.Prediction = data;
-          console.log(data);
+          //false処理を書く
+          if(data){
+            Prediction_obj.Prediction = [data.W_key,data.word1,data.word2,data.word3];
+          }else{
+            Prediction_obj.Prediction = [get_key(flg).slice(0,1),"","",""];
+          }
           if(mode == "WP"){
             post_WP(get_key(flg),word,flg,Prediction_obj);
             mode = "TP";

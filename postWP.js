@@ -86,7 +86,7 @@ function checkDB_WP(key,word,flg,Prediction_obj){
   //spliceの削除先配列
   var remove;
 
-  //console.log(Prediction_1);
+  console.log(Prediction_obj);
 
   if(flg == 1){
     $.each(Prediction_obj.Prediction, function(i,val){
