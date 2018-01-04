@@ -32,6 +32,7 @@
     }
     var borderWidth = 1;
 
+    //Google 手書きAPIの送信用の時間定義
     var startTime;
     var endTime;
 
@@ -41,10 +42,15 @@
 
     var oldpost;
 
+
+
+    //TP用の前回の入力と配列
     var Old_key = "";
     var T_Prediction =[];
 
+    //現在のモード,辞書送信のご送信を防ぐ
     var mode = "WP";
+
 
     // text yo be sent
     var text = {
@@ -66,8 +72,24 @@
     };
 
     // 予測候補の配列
-    var Prediction_1,Prediction_2,Prediction_3;
-    var W_Prediction_1,W_Prediction_2,W_Prediction_3;
+    for(var i = 1; i < BUTTON_NUMBER + 1; i++ ){
+      myEval("var Prediction_" + i + ";");
+      myEval("var W_Prediction_" + i + ";");
+      myEval("var result" + i + ";");
+    }
+
+    //htmlにボタンを追加
+    var inputbtns_text = '';
+    for(var i = 1; i < BUTTON_NUMBER + 1; i++){
+      inputbtns_text += '<div>';
+      inputbtns_text += '<button class="inputbtn ' +  'bline' + i + '" id="input_b' + i + '"></button>'
+      for(var  j = 1; j < PREDICTION_NUMBER + 1; j++){
+        inputbtns_text += '<button class="inputbtn ' +  'bline' + i + '" id="input_b' + i + '_' + j + '"></button>'
+      }
+      inputbtns_text += '</div>'
+    }
+    //console.log(inputbtns_text);
+    $('#inputbtns').prepend(inputbtns_text);
 
 
     canvas.addEventListener("mousemove", function(e){
@@ -75,7 +97,6 @@
       var rect = e.target.getBoundingClientRect();
       mouse.x = e.clientX - rect.left - borderWidth;
       mouse.y = e.clientY - rect.top - borderWidth;
-
       //isDrawがtrueのとき描画
       if (mouse.isDrawing){
         ctx.beginPath();
@@ -146,7 +167,8 @@
       mouse.secondY = mouse.y;
       mouse.isDrawing = false;
       i++;
-      setTimeout(getResult(),3000);
+      //setTimeout(getResult(),3000);
+      getResult();
 
     });
     canvas.addEventListener("touchstart", function(e){
@@ -169,38 +191,42 @@
       pos.isDrawing = false;
       i++;
       //console.log(text.requests[0].ink);
-      setTimeout(getResult(),3000);
+      //setTimeout(getResult(),3000);
+      getResult();
     });
 
 
-  $('#inputbtn').click(function(e) {
-    $("#input").append(result1);
-    result="";
-    $("#info").text("");
-    text.requests[0].ink = [];
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-  });
 
+    //Buttonが押されるとlineのnumberをflgとしてpushButtonを起こす
+    for(var i = 1; i < BUTTON_NUMBER ;i++){
+      $(".bline" + i).click(function(e){
+        var flg = $(this).attr("id");
+        pushButton($(this).text(),flg.slice(7,8));
+      })
+    }
 
-  $("#input_b1a,#input_b1b,#input_b1c").click(function(e){
-    pushButton($(this).text(),1);
-  });
-  $("#input_b2a,#input_b2b,#input_b2c").click(function(e){
-    pushButton($(this).text(),2);
-  });
-  $("#input_b3a,#input_b3b,#input_b3c").click(function(e){
-    pushButton($(this).text(),3);
-  });
 
 
 
     $('#clear').click(function(e) {
       $("#info").text("");
-      result="";
       text.requests[0].ink = [];
       ctx.clearRect(0,0,canvas.width,canvas.height);
       clear_Prediction();
     });
+
+    new Clipboard('#copybtn');
+
+    /*
+
+    $('#copybtn').click(function(e) {
+      if(execCopy("乙倉")){
+        alert('コピーできました');
+      }
+      else {
+        alert('このブラウザでは対応していません');
+      }
+    });*/
 
 
     function scrollX(){return document.documentElement.scrollLeft || document.body.scrollLeft;}
@@ -218,43 +244,22 @@
         //console.log(json);
         mode = "WP";
 
-        //有力候補を上から3つ所持する
-        result1 = json[1][0][1][0];
-        result2 = json[1][0][1][1];
-        result3 = json[1][0][1][2];
+        //有力候補を取得する
+        for(var i = 1; i < BUTTON_NUMBER + 1 ; i++){
+          myEval('result' + i + ' = "' + json[1][0][1][(i-1)] + '";' );
+          result = json[1][0][1][(i-1)];
+          $('#input_b' + i).text(result);
+        }
+        //console.log(result1);
 
-       //最有力候補
-       //$("#info").text(result1);
+        $('.inputbtn').css('display','inline');
 
-       //入力予測のボタンを提示
-       //とりあえず,候補3つを提示
-       //$('#input_buttons').empty();
-       document.getElementById("input_b1").style.display = "inline";
-       document.getElementById("input_b2").style.display = "inline";
-       document.getElementById("input_b3").style.display = "inline";
-       $('#input_b1').text(result1);
-       $('#input_b2').text(result2);
-       $('#input_b3').text(result3);
-
-       document.getElementById("input_b1a").style.display = "none";
-       document.getElementById("input_b1b").style.display = "none";
-       document.getElementById("input_b1c").style.display = "none";
-       document.getElementById("input_b2a").style.display = "none";
-       document.getElementById("input_b2b").style.display = "none";
-       document.getElementById("input_b2c").style.display = "none";
-       document.getElementById("input_b3a").style.display = "none";
-       document.getElementById("input_b3b").style.display = "none";
-       document.getElementById("input_b3c").style.display = "none";
-
-
-
-       //予測候補をプラスで追加する getPredition(key,num)
+       //予測候補を追加する getPredition(key,num)
        getPredition();
 
        //辞書取得を完了を確認してからCGI取得を行いたい
        //Predictionを全て埋めてからputPreditionする.
        //putPredition();
-
 
       });
 
@@ -267,47 +272,86 @@
         */
         //keyとnumを受け取って,投げる
         function getPredition (){
+
           //undefined用の空きを確認するobj
-          var cgi_num = {
-            Prediction_1 : [],
-            Prediction_2 : [],
-            Prediction_3 : []
-          };
+          //cgi,suggestを使用する場所のobj
+          var cgi_num = {};
+          var requests = [];
 
-          var requests = [
-            { param: { key: result1 } },
-            { param: { key: result2 } },
-            { param: { key: result3 } }
-          ];
+          //cgi_numとrequestsの初期化
+          //上手くいかないのでeval使用
+          for(var i=1;i < BUTTON_NUMBER + 1;i++){
+            eval('cgi_num.Prediction_' + i + ' = [];');
+            eval('requests.push({ param: { key: result' + i + '} });');
+          }
 
-          //console.log(requests);
 
-          $.when(
-            getDB_WP(requests[0].param.key),
-            getDB_WP(requests[1].param.key),
-            getDB_WP(requests[2].param.key))
-            .done(function(data_1,data_2,data_3){
-              if(data_1){
-                Prediction_1 = [data_1.W_key,data_1.word1,data_1.word2,data_1.word3];
-                W_Prediction_1 = [data_1.W_key,data_1.word1,data_1.word2,data_1.word3];
-              }else{
-                Prediction_1 = [result1,"","",""];
-                W_Prediction_1 = [result1,"","",""]
-              }
-              if(data_2){
-                Prediction_2 = [data_2.W_key,data_2.word1,data_2.word2,data_2.word3];
-                W_Prediction_2 = [data_2.W_key,data_2.word1,data_2.word2,data_2.word3];
-              }else{
-                Prediction_2 = [result2,"","",""];
-                W_Prediction_2 = [result2,"","",""];
-              }
-              if(data_3){
-                Prediction_3 = [data_3.W_key,data_3.word1,data_3.word2,data_3.word3];
-                W_Prediction_3 = [data_3.W_key,data_3.word1,data_3.word2,data_3.word3];
-              }else{
-                Prediction_3 = [result3,"","",""];
-                W_Prediction_3 = [result3,"","",""];
-              }
+          var getDB_txt = "";
+          var data_txt = "";
+          var getDB_pre_txt = "";
+
+          //evalにsetするtextのset
+          for(var i=1;i < BUTTON_NUMBER+1;i++){
+
+            //getDB_txt : getDB に渡す,非同期処理を書いてある
+            getDB_txt += 'getDB_WP(requests[' + (i-1) + '].param.key)';
+            if(i != BUTTON_NUMBER){
+              getDB_txt += ',';
+            }
+
+            //whenから受け取る形
+            data_txt += "data_" + i; //data_1
+            if(i != BUTTON_NUMBER){
+              data_txt += ',';
+            }
+
+            //main処理,受け取ったものを配列に埋め込む
+            getDB_pre_txt += "if(data_" + i + "){";
+            getDB_pre_txt += "Prediction_" + i + ' = [data_' + i + '.W_key';
+            for(var j = 1;j < PREDICTION_NUMBER + 1;j++){
+              getDB_pre_txt += ',data_' + i + '.word' + j;
+            }
+            getDB_pre_txt += '];';
+            getDB_pre_txt += "W_Prediction_" + i + ' = [data_' + i + '.W_key';
+            for(var j = 1;j < PREDICTION_NUMBER + 1;j++){
+              getDB_pre_txt += ',data_' + i + '.word' + j;
+            }
+            getDB_pre_txt += ']; }else{ ';
+            getDB_pre_txt += 'Prediction_' + i + ' = [result' + i;
+            for(var j = 1;j < PREDICTION_NUMBER + 1;j++){
+              getDB_pre_txt += ',""';
+            }
+            getDB_pre_txt += '];';
+            getDB_pre_txt += 'W_Prediction_' + i + ' = [result' + i;
+            for(var j = 1;j < PREDICTION_NUMBER + 1;j++){
+              getDB_pre_txt += ',""';
+            }
+            getDB_pre_txt += '];}';
+            //getDB_pre_txt += 'console.log(Prediction_1);'
+
+
+
+          }
+
+          for(var j =1;j<BUTTON_NUMBER+1;j++){
+            getDB_pre_txt += 'undefined_Preiction(W_Prediction_' + j + ',' + j + ',cgi_num);';
+
+          }
+
+          //残りの取得手法を選択
+          //getDB_pre_txt += 'getCGI(cgi_num);'
+          getDB_pre_txt += 'get_suggest(cgi_num);'
+
+          //console.log(getDB_pre_txt);
+
+          eval('$.when(' + getDB_txt + ').done(function(' + data_txt + '){' + getDB_pre_txt + '});');
+
+          //console.log(cgi_num);
+
+            /*.done(function(data,data1){
+              console.log(data);
+              console.log(data1);
+              myEval(getDB_pre_txt);
               //console.log(Prediction_1);
               //console.log(Prediction_2);
               //console.log(Prediction_3);
@@ -317,24 +361,17 @@
               //console.log(cgi_num);
               //getCGI(cgi_num);
               get_suggest(cgi_num);
-            });
+            });*/
 
+          }
 
-
-        }
 
         function undefined_Preiction(get_data,num,cgi_num){ //Predictionの空の場所をobjに入れる
           $.each(get_data, function(i,val){
             //console.log(i + " : " + num + " :: " + val);
             if(val === ""){ //undefinedであれば実行,値が既にあれば実行しない
               if(i != 0){ //Prediction_*のkeyに突っ込む i:配列の番号,num:Predictionの数
-                if(num == 1){
-                  cgi_num.Prediction_1.push(i);
-                }else if(num == 2){
-                  cgi_num.Prediction_2.push(i);
-                }else{
-                  cgi_num.Prediction_3.push(i);
-                }
+                eval('cgi_num.Prediction_' + num + '.push(' + i + ');')
               }
             }
           });
@@ -342,6 +379,37 @@
 
 
         function getCGI(cgi_num){ //undefineの(空欄)に予測候補(CGI)を詰める
+          var getCGI_txt = "";
+          var data_txt = "";
+          var getCGI_pre_txt = "";
+
+          //evalにsetするtextのset
+          for(var i=1;i < BUTTON_NUMBER+1;i++){
+
+            //getCGI_txt : getCGI に渡す,非同期処理を書いてある
+            getCGI_txt += 'CGI(get_key(' + i + '))';
+            if(i != BUTTON_NUMBER){
+              getCGI_txt += ',';
+            }
+
+            //whenから受け取る形
+            data_txt += "data_" + i; //data_1
+            if(i != BUTTON_NUMBER){
+              data_txt += ',';
+            }
+
+
+            //main処理,受け取ったものを配列に埋め込む
+            getCGI_pre_txt += "$.each(cgi_num.Prediction_" + i + ',function(i,val){';
+            getCGI_pre_txt += "Prediction_" + i + '[val] = data_' +i+ '[0][1][val-1];});';
+
+          }
+
+          getCGI_pre_txt += 'putPredition();'
+
+          eval('$.when(' + getCGI_txt + ').done(function(' + data_txt + '){' + getCGI_pre_txt + '});');
+
+          /*
           $.when(
             CGI(get_key(1)),
             CGI(get_key(2)),
@@ -359,12 +427,43 @@
               });
               putPredition();
 
-            });
+            });*/
           //getがundefinedであればgetCGIする.
+
 
         }
 
         function get_suggest(cgi_num){ //undefineの(空欄)に予測候補(CGI)を詰める
+          var getsuggest_txt = "";
+          var data_txt = "";
+          var getsuggest_pre_txt = "";
+
+          //evalにsetするtextのset
+          for(var i=1;i < BUTTON_NUMBER+1;i++){
+
+            //getsuggest_txt : getsuggest に渡す,非同期処理を書いてある
+            getsuggest_txt += 'suggest(get_key(' + i + '))';
+            if(i != BUTTON_NUMBER){
+              getsuggest_txt += ',';
+            }
+
+            //whenから受け取る形
+            data_txt += "data_" + i; //data_1
+            if(i != BUTTON_NUMBER){
+              data_txt += ',';
+            }
+
+
+            //main処理,受け取ったものを配列に埋め込む
+            getsuggest_pre_txt += "$.each(cgi_num.Prediction_" + i + ',function(i,val){';
+            getsuggest_pre_txt += "Prediction_" + i + '[val] = data_' +i+ '[1][val-1];});';
+
+          }
+
+          getsuggest_pre_txt += 'putPredition();'
+
+          eval('$.when(' + getsuggest_txt + ').done(function(' + data_txt + '){' + getsuggest_pre_txt + '});');
+          /*
           $.when(
             suggest(get_key(1)),
             suggest(get_key(2)),
@@ -382,12 +481,13 @@
               });
               putPredition();
 
-            });
+            });*/
           //getがundefinedであればgetCGIする.
 
         }
 
     //input用の候補本体をボタンに入力機能を追加
+    /*
     $('#input_b1').click(function(e) {
       pushButton(result1,10);
     });
@@ -396,32 +496,15 @@
     });
     $('#input_b3').click(function(e) {
       pushButton(result3,30);
-    });
+    });*/
 
     function putPredition (){
-      //if(num == 1){
-        $('#input_b1a').text(Prediction_1[1]);
-        $('#input_b1b').text(Prediction_1[2]);
-        $('#input_b1c').text(Prediction_1[3]);
-        document.getElementById("input_b1a").style.display = "inline";
-        document.getElementById("input_b1b").style.display = "inline";
-        document.getElementById("input_b1c").style.display = "inline";
-      //}
-      //else if (num == 2) {
-        $('#input_b2a').text(Prediction_2[1]);
-        $('#input_b2b').text(Prediction_2[2]);
-        $('#input_b2c').text(Prediction_2[3]);
-        document.getElementById("input_b2a").style.display = "inline";
-        document.getElementById("input_b2b").style.display = "inline";
-        document.getElementById("input_b2c").style.display = "inline";
-      //}
-      //else if (num == 3) {
-        $('#input_b3a').text(Prediction_3[1]);
-        $('#input_b3b').text(Prediction_3[2]);
-        $('#input_b3c').text(Prediction_3[3]);
-        document.getElementById("input_b3a").style.display = "inline";
-        document.getElementById("input_b3b").style.display = "inline";
-        document.getElementById("input_b3c").style.display = "inline";
+      for(var i=1;i<BUTTON_NUMBER+1;i++){
+        for(var j=1;j<PREDICTION_NUMBER+1;j++){
+          myEval('$("#input_b' +i+ '_' +j+ '").text(Prediction_' +i+ '[' +j+ ']);')
+        }
+      }
+        $('.inputbtn').css('display','inline');
       //}
     }
 
@@ -448,44 +531,20 @@
 
     //flgからkeyを取ってくる
     function get_key(flg){
-      if(flg == 1 || flg == 10){
-        return result1;
-      }else if(flg == 2 || flg == 20){
-        return result2;
-      }else{
-        return result3;
-      }
+      var key = eval('Prediction_' +flg+ '[0];');
+      return key;
     }
 
     function get_prediction(flg){
-      if(flg == 1 || flg == 10){
-        return Prediction_1;
-      }else if(flg == 2 || flg == 20){
-        return Prediction_2;
-      }else{
-        return Prediction_3;
-      }
+      var pre = eval('Prediction_' +flg+ ';');
+      return pre;
     }
 
     function clear_Prediction(){
-      document.getElementById("input_b1").style.display = "none";
-      document.getElementById("input_b2").style.display = "none";
-      document.getElementById("input_b3").style.display = "none";
-      $("#info").text("");
-      $('#input_b1').text("");
-      $('#input_b2').text("");
-      $('#input_b3').text("");
+      $('.inputbtn').css('display','none');
+      $('.inputbtn').text("");
       text.requests[0].ink = [];
       ctx.clearRect(0,0,canvas.width,canvas.height);
-      document.getElementById("input_b1a").style.display = "none";
-      document.getElementById("input_b1b").style.display = "none";
-      document.getElementById("input_b1c").style.display = "none";
-      document.getElementById("input_b2a").style.display = "none";
-      document.getElementById("input_b2b").style.display = "none";
-      document.getElementById("input_b2c").style.display = "none";
-      document.getElementById("input_b3a").style.display = "none";
-      document.getElementById("input_b3b").style.display = "none";
-      document.getElementById("input_b3c").style.display = "none";
     }
 
     //予測候補が辞書に含まれるか確認する
@@ -506,12 +565,12 @@
             T_Prediction = [word,"","",""];
           }
           //console.log(T_Prediction);
-          $('#input_b1a').text(T_Prediction[1]);
-          $('#input_b1b').text(T_Prediction[2]);
-          $('#input_b1c').text(T_Prediction[3]);
-          document.getElementById("input_b1a").style.display = "inline";
-          document.getElementById("input_b1b").style.display = "inline";
-          document.getElementById("input_b1c").style.display = "inline";
+          $('#input_b1_1').text(T_Prediction[1]);
+          $('#input_b1_2').text(T_Prediction[2]);
+          $('#input_b1_3').text(T_Prediction[3]);
+          document.getElementById("input_b1_1").style.display = "inline";
+          document.getElementById("input_b1_2").style.display = "inline";
+          document.getElementById("input_b1_3").style.display = "inline";
 
       });
 
@@ -533,8 +592,7 @@
         Prediction: ""
       }
 
-
-
+      //文字を入力
       $("#input").append(word);
       //console.log(Prediction_obj);
 
@@ -542,11 +600,12 @@
       $.when(
         getDB_WP(get_key(flg).slice(0,1)))
         .done(function(data){
+          //console.log(data);
           //false処理を書く
           if(data){
-            Prediction_obj.Prediction = [data.W_key,data.word1,data.word2,data.word3];
+            Prediction_obj.Prediction = [data.W_key,data.word1,data.word2,data.word3,data.word4,data.word5,data.word6,data.word7,data.word8,data.word9,data.word10];
           }else{
-            Prediction_obj.Prediction = [get_key(flg).slice(0,1),"","",""];
+            Prediction_obj.Prediction = [get_key(flg).slice(0,1),"","","","","","","","","",""];
           }
           if(mode == "WP"){
             post_WP(get_key(flg),word,flg,Prediction_obj);
@@ -566,12 +625,12 @@
 
       Old_key = word;
 
-      $('#input_b2a').text("が");
-      $('#input_b2b').text("の");
-      $('#input_b2c').text("を");
-      document.getElementById("input_b2a").style.display = "inline";
-      document.getElementById("input_b2b").style.display = "inline";
-      document.getElementById("input_b2c").style.display = "inline";
+      $('#input_b2_1').text("が");
+      $('#input_b2_2').text("の");
+      $('#input_b2_3').text("を");
+      document.getElementById("input_b2_1").style.display = "inline";
+      document.getElementById("input_b2_2").style.display = "inline";
+      document.getElementById("input_b2_3").style.display = "inline";
 
     }
 
@@ -579,13 +638,19 @@
     function put_TextPrediction(Old_key,word,T_Prediction){
       post_TP(Old_key,word);
       //検索に当てはまらなければ,助詞を提示する
-      $('#input_b2a').text("が");
-      $('#input_b2b').text("の");
-      $('#input_b2c').text("を");
-      document.getElementById("input_b2a").style.display = "inline";
-      document.getElementById("input_b2b").style.display = "inline";
-      document.getElementById("input_b2c").style.display = "inline";
+      $('#input_b2_1').text("が");
+      $('#input_b2_2').text("の");
+      $('#input_b2_3').text("を");
+      document.getElementById("input_b2_1").style.display = "inline";
+      document.getElementById("input_b2_2").style.display = "inline";
+      document.getElementById("input_b2_3").style.display = "inline";
 
+    }
+
+    //実行関数
+    function myEval(expr){
+      //console.log(expr);
+      Function(expr)();
     }
 
   }

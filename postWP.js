@@ -16,7 +16,7 @@ getで常にDBから予測候補は取ってあるのでそれを弄って送る
 function postDB_WP(send_data){
     //console.log("post : " + key + word);
 
-    console.log(send_data);
+    //console.log(send_data);
 
 	// Ajax 通信の実行
 	$.ajax({
@@ -27,7 +27,7 @@ function postDB_WP(send_data){
 		success: function(){	// 通信に成功した場合の処理
 
 			// アラートを出力（値が単一の場合）
-		 console.log("post success" + send_data);
+		 //console.log("post success" + send_data);
 
 
 		},
@@ -50,7 +50,7 @@ function post_WP(key,word,flg,Prediction_obj){
 
   //console.log(key + " : " + word);
 
-  console.log(key.slice(0,1));
+  //console.log(key.slice(0,1));
 
 
   //FLGで条件分岐
@@ -77,54 +77,32 @@ function checkDB_WP(key,word,flg,Prediction_obj){
   //keyに対応するのでここでobjを作る
   //jsondataはobjectがいいらしい
   var send_data = {
-    key : key,
-    word1 : "",
-    word2 : "",
-    word3 : "",
+    key : key
   };
 
   //spliceの削除先配列
   var remove;
 
-  console.log(Prediction_obj);
+  //console.log(Prediction_obj);
 
-  if(flg == 1){
-    $.each(Prediction_obj.Prediction, function(i,val){
-      if(val === word && i != 0){ //一致する
-        remove = Prediction_obj.Prediction.splice(i,1);
-      }
-    });
-    //辞書登録されていない単語,頭に突っ込めばいい
-    remove = Prediction_obj.Prediction.splice(1,0,word);
-    return fix_send_data(Prediction_obj.Prediction,send_data);
-  }else if(flg == 2 ){
-    $.each(Prediction_obj.Prediction, function(i,val){
-      if(val === word && i != 0){ //一致する
-        remove = Prediction_obj.Prediction.splice(i,1).splice(1,0,word);
-        return fix_send_data(Prediction_obj.Prediction,send_data);
-      }
-    });
-    remove = Prediction_obj.Prediction.splice(1,0,word);
-    return fix_send_data(Prediction_obj.Prediction,send_data);
-  }else{
-    $.each(Prediction_obj.Prediction, function(i,val){
-      if(val === word){ //一致する
-        remove = Prediction_obj.Prediction.splice(i,1).splice(1,0,word);
-        return fix_send_data(Prediction_obj.Prediction,send_data);
-      }
-    });
-    remove = Prediction_obj.Prediction.splice(1,0,word);
-    return fix_send_data(Prediction_obj.Prediction,send_data);
-  }
+  $.each(Prediction_obj.Prediction, function(i,val){
+    if(val === word && i != 0){ //一致する
+      remove = Prediction_obj.Prediction.splice(i,1);
+    }
+  });
+  //辞書登録されていない単語,頭に突っ込めばいい
+  remove = Prediction_obj.Prediction.splice(1,0,word);
+  return fix_send_data(Prediction_obj.Prediction,send_data);
 
 }
 
 //配列を受け取ってsend_dataに詰め込む、send_dataを返したい
 //受け取るsend_dataにはkeyだけ入れてある
 function fix_send_data(Prediction,send_data){
-  send_data.word1 = Prediction[1];
-  send_data.word2 = Prediction[2];
-  send_data.word3 = Prediction[3];
+  for(var i=1;i<11;i++){
+    eval("send_data.word" +i+ " = Prediction[" + i +"];");
+  }
+  //console.log(send_data);
 
   return send_data;
 }

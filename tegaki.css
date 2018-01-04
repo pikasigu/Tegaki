@@ -1,4 +1,4 @@
-#input_b1,#input_b2,#input_b3 {
+.inputbtn {
   font-size: 1.0em;
   font-weight: bold;
   margin: 5px;
@@ -19,25 +19,7 @@
 
 
 }
-#input_b1a,#input_b1b,#input_b1c,#input_b2a,#input_b2b,#input_b2c,#input_b3a,#input_b3b,#input_b3c {
-  font-size: 1.0em;
-  font-weight: bold;
-  margin: 5px;
-  text-align: center;
 
-  /* 背景色を濃い青色に指定 */
-  background-color: #248;
-  /* 文字色を白色に指定 */
-  color: #fff;
-  /* ボーダーをなくす */
-  border-style: none;
-
-  /* 初期非表示 */
-  display: none;
-
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
-
-
+.bline1 .bline2 .bline3 .bline4 .bline5 .bline6 .bline7 .bline8 .bline9 .bline10 {
+  
 }

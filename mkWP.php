@@ -9,12 +9,26 @@ $key = filter_input(INPUT_POST, 'key');
 $word1 = filter_input(INPUT_POST, 'word1');
 $word2 = filter_input(INPUT_POST, 'word2');
 $word3 = filter_input(INPUT_POST, 'word3');
+$word4 = filter_input(INPUT_POST, 'word4');
+$word5 = filter_input(INPUT_POST, 'word5');
+$word6 = filter_input(INPUT_POST, 'word6');
+$word7 = filter_input(INPUT_POST, 'word7');
+$word8 = filter_input(INPUT_POST, 'word8');
+$word9 = filter_input(INPUT_POST, 'word9');
+$word10 = filter_input(INPUT_POST, 'word10');
 //送信用に配列に格納
 $data = array(
   "key" => $key,
   "word1" => $word1,
   "word2" => $word2,
   "word3" => $word3,
+  "word4" => $word4,
+  "word5" => $word5,
+  "word6" => $word6,
+  "word7" => $word7,
+  "word8" => $word8,
+  "word9" => $word9,
+  "word10" => $word10
 );
 
 //DB処理を突っ込む
@@ -33,7 +47,7 @@ try{
   //なければINSERTあればUPDATA
   $sql ="delete from WordPrediction where W_key='$key'";
   $stmt = $pdo -> query($sql);
-  $sql ="INSERT INTO WordPrediction (W_key, word1, word2, word3) VALUES ('$key', '$word1', '$word2', '$word3')";
+  $sql ="INSERT INTO WordPrediction (W_key, word1, word2, word3,word4, word5, word6,word7, word8, word9,word10) VALUES ('$key', '$word1', '$word2', '$word3','$word4', '$word5', '$word6','$word7', '$word8', '$word9','$word10')";
   $stmt = $pdo -> query($sql);
   //var_dump($stmt);
   //$stmt->execute(); //実行
