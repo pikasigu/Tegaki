@@ -4,4 +4,4 @@
 //手書き認識が返す識字の数1~11程度
 var BUTTON_NUMBER = 3;
 //予測候補の数
-var PREDICTION_NUMBER = 5;
+var PREDICTION_NUMBER = 3;

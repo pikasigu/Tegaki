@@ -14,6 +14,7 @@
       }
       #mycanvas{
         border: 1px solid #333;
+
       }
     </style>
 
@@ -33,18 +34,29 @@
 
   </head>
   <body>
-    <canvas width="800" height="400" id="mycanvas">
-      Canvasに対応したブラウザを用意して下さい。
-    </canvas>
-    <p><textarea name="inputarea" id="input" cols="40" rows="5" style="font-size:80%;" ></textarea></p>
+
     <div id="info"></div>
+    <button id="text_clear"> text clear </button>
     <button id="clear"> clear </button>
+    <button id="spacebtn"> space </button>
+    <button id="new_line"> new line </button>
     <button id="copybtn" data-clipboard-target="#input"> copy </button>
     <div id="inputbtns">
     </div>
+    <div id="particle">
+      <button class = "particle_btn" id="input_ga">が</button>
+      <button class = "particle_btn" id="input_no">の</button>
+      <button class = "particle_btn" id="input_wo">を</button>
+      <button class = "particle_btn" id="input_ni">に</button>
+      <button class = "particle_btn" id="input_he">へ</button>
+    </div>
 
     <pre></pre>
+    <canvas width="800" height="400" id="mycanvas">
+      Canvasに対応したブラウザを用意して下さい。
+    </canvas>
 
+    <p><textarea name="inputarea" id="input" cols="40" rows="5" style="font-size:80%;" ></textarea></p>
 
   </body>
 </html>

@@ -198,7 +198,7 @@
 
 
     //Buttonが押されるとlineのnumberをflgとしてpushButtonを起こす
-    for(var i = 1; i < BUTTON_NUMBER ;i++){
+    for(var i = 1; i < BUTTON_NUMBER + 1 ;i++){
       $(".bline" + i).click(function(e){
         var flg = $(this).attr("id");
         pushButton($(this).text(),flg.slice(7,8));
@@ -213,6 +213,17 @@
       text.requests[0].ink = [];
       ctx.clearRect(0,0,canvas.width,canvas.height);
       clear_Prediction();
+      Old_key = "";
+    });
+
+    $('#text_clear').click(function(e) {
+      $('#input').text("");
+    });
+    $('#spacebtn').click(function(e) {
+      $('#input').append(" ");
+    });
+    $('#new_line').click(function(e) {
+      $('#input').append("\n");
     });
 
     new Clipboard('#copybtn');
@@ -251,6 +262,8 @@
           $('#input_b' + i).text(result);
         }
         //console.log(result1);
+
+        $('.particle_btn').css('display','none');
 
         $('.inputbtn').css('display','inline');
 
@@ -625,12 +638,7 @@
 
       Old_key = word;
 
-      $('#input_b2_1').text("が");
-      $('#input_b2_2').text("の");
-      $('#input_b2_3').text("を");
-      document.getElementById("input_b2_1").style.display = "inline";
-      document.getElementById("input_b2_2").style.display = "inline";
-      document.getElementById("input_b2_3").style.display = "inline";
+      $('.particle_btn').css('display','inline');
 
     }
 
@@ -638,13 +646,29 @@
     function put_TextPrediction(Old_key,word,T_Prediction){
       post_TP(Old_key,word);
       //検索に当てはまらなければ,助詞を提示する
-      $('#input_b2_1').text("が");
-      $('#input_b2_2').text("の");
-      $('#input_b2_3').text("を");
-      document.getElementById("input_b2_1").style.display = "inline";
-      document.getElementById("input_b2_2").style.display = "inline";
-      document.getElementById("input_b2_3").style.display = "inline";
+      $('.particle_btn').css('display','inline');
 
+    }
+
+    $('#input_ga').click(function(e){
+      push_particle("が")
+    });
+    $('#input_no').click(function(e){
+      push_particle("の")
+    });
+    $('#input_wo').click(function(e){
+      push_particle("を")
+    });
+    $('#input_ni').click(function(e){
+      push_particle("に")
+    });
+    $('#input_he').click(function(e){
+      push_particle("へ")
+    });
+
+    function push_particle(word){
+      //文字を入力
+      $("#input").append(word);
     }
 
     //実行関数
