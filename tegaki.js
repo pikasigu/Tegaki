@@ -27,7 +27,7 @@
       getY: 0,
       x: 0,
       y: 0,
-      color: "black",
+      color: "blue",
       isDrawing: false
     }
     var borderWidth = 1;
@@ -213,7 +213,7 @@
       text.requests[0].ink = [];
       ctx.clearRect(0,0,canvas.width,canvas.height);
       clear_Prediction();
-      Old_key = "";
+      //Old_key = "";
     });
 
     $('#text_clear').click(function(e) {
@@ -246,7 +246,7 @@
     //google手書き認識API
     function getResult(){
       $.ajax({
-        url : 'https://inputtools.google.com/request?itc=ja-t-i0-handwrit&amp;app=demopage',
+        url : 'https://inputtools.google.com/request?itc=ja-t-i0-handwrit',
         method : 'POST',
         contentType : 'application/json',
         data : JSON.stringify(text),
@@ -268,7 +268,10 @@
         $('.inputbtn').css('display','inline');
 
        //予測候補を追加する getPredition(key,num)
+       //setTimeout(getPredition,500);
        getPredition();
+
+
 
        //辞書取得を完了を確認してからCGI取得を行いたい
        //Predictionを全て埋めてからputPreditionする.
@@ -285,6 +288,9 @@
         */
         //keyとnumを受け取って,投げる
         function getPredition (){
+          //console.log(mouse);
+          if(pos.isDrawing || mouse.isDrawing){}
+          else{
 
           //undefined用の空きを確認するobj
           //cgi,suggestを使用する場所のobj
@@ -352,8 +358,8 @@
           }
 
           //残りの取得手法を選択
-          //getDB_pre_txt += 'getCGI(cgi_num);'
-          getDB_pre_txt += 'get_suggest(cgi_num);'
+          getDB_pre_txt += 'getCGI(cgi_num);'
+          //getDB_pre_txt += 'get_suggest(cgi_num);'
 
           //console.log(getDB_pre_txt);
 
@@ -377,6 +383,7 @@
             });*/
 
           }
+        }
 
 
         function undefined_Preiction(get_data,num,cgi_num){ //Predictionの空の場所をobjに入れる
