@@ -1,6 +1,6 @@
 <?php
 /*
-DBからWPを引っ張り出して,予測候補を返す
+DBからTPを引っ張り出して,予測候補を返す
 */
 
 //ヘッダーの設定
@@ -17,7 +17,7 @@ try{
   //PDOインスタンス生成
   $pdo = new PDO($dsn,$username,$password);
 //SELECT文
-$sql = "SELECT * FROM WordPrediction WHERE W_key = '$key_data'";
+$sql = "SELECT * FROM TextPrediction WHERE T_key = '$key_data'";
 $stmt = $pdo->query($sql);
 //echo $sql;
 $stmt -> execute(); //実行
