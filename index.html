@@ -35,12 +35,10 @@
   </head>
   <body>
 
-    <div id="info"></div>
-    <button id="text_clear"> text clear </button>
-    <button id="clear"> clear </button>
-    <button id="spacebtn"> space </button>
-    <button id="new_line"> new line </button>
-    <button id="copybtn" data-clipboard-target="#input"> copy </button>
+    <div>下のcanvasに文字を手書きして下さい</div>
+    <p><textarea name="inputarea" id="input" cols="40" rows="5" style="font-size:80%;" ></textarea></p>
+
+
     <div id="inputbtns">
     </div>
     <div id="particle">
@@ -52,11 +50,11 @@
     </div>
 
     <pre></pre>
-    <canvas width="800" height="400" id="mycanvas">
+    <canvas width="1000" height="500" id="mycanvas">
       Canvasに対応したブラウザを用意して下さい。
     </canvas>
 
-    <p><textarea name="inputarea" id="input" cols="40" rows="5" style="font-size:80%;" ></textarea></p>
+
 
   </body>
 </html>

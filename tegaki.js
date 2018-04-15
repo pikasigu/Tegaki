@@ -1,3 +1,6 @@
+/**
+*手書き認識の本体部分
+*/
 (function(){
   window.onload = function(){
     var canvas = document.getElementById('mycanvas');
@@ -36,6 +39,7 @@
     var startTime;
     var endTime;
 
+
     var result;
     var i = 0;
     var Timer = 0;
@@ -52,7 +56,7 @@
     var mode = "WP";
 
 
-    // text yo be sent
+    //Google手書き認識APIに投げるための定義
     var text = {
       'app_version' : 0.4,
       'api_level' : '537.36',
@@ -88,7 +92,6 @@
       }
       inputbtns_text += '</div>'
     }
-    //console.log(inputbtns_text);
     $('#inputbtns').prepend(inputbtns_text);
 
 
@@ -111,6 +114,7 @@
     });
 
     canvas.addEventListener("touchmove", function(e){
+      //タッチ認識用
       var post = getPosT(e);
       if (pos.isDrawing){
         ctx.beginPath();
@@ -190,7 +194,6 @@
       //pos.secondY = pos.y;
       pos.isDrawing = false;
       i++;
-      //console.log(text.requests[0].ink);
       //setTimeout(getResult(),3000);
       getResult();
     });
@@ -227,18 +230,6 @@
     });
 
     new Clipboard('#copybtn');
-
-    /*
-
-    $('#copybtn').click(function(e) {
-      if(execCopy("乙倉")){
-        alert('コピーできました');
-      }
-      else {
-        alert('このブラウザでは対応していません');
-      }
-    });*/
-
 
     function scrollX(){return document.documentElement.scrollLeft || document.body.scrollLeft;}
     function scrollY(){return document.documentElement.scrollTop || document.body.scrollTop;}
@@ -358,29 +349,10 @@
           }
 
           //残りの取得手法を選択
-          getDB_pre_txt += 'getCGI(cgi_num);'
-          //getDB_pre_txt += 'get_suggest(cgi_num);'
-
-          //console.log(getDB_pre_txt);
+          //getDB_pre_txt += 'getCGI(cgi_num);'
+          getDB_pre_txt += 'get_suggest(cgi_num);'
 
           eval('$.when(' + getDB_txt + ').done(function(' + data_txt + '){' + getDB_pre_txt + '});');
-
-          //console.log(cgi_num);
-
-            /*.done(function(data,data1){
-              console.log(data);
-              console.log(data1);
-              myEval(getDB_pre_txt);
-              //console.log(Prediction_1);
-              //console.log(Prediction_2);
-              //console.log(Prediction_3);
-              undefined_Preiction(W_Prediction_1,1,cgi_num);
-              undefined_Preiction(W_Prediction_2,2,cgi_num);
-              undefined_Preiction(W_Prediction_3,3,cgi_num);
-              //console.log(cgi_num);
-              //getCGI(cgi_num);
-              get_suggest(cgi_num);
-            });*/
 
           }
         }
@@ -388,7 +360,6 @@
 
         function undefined_Preiction(get_data,num,cgi_num){ //Predictionの空の場所をobjに入れる
           $.each(get_data, function(i,val){
-            //console.log(i + " : " + num + " :: " + val);
             if(val === ""){ //undefinedであれば実行,値が既にあれば実行しない
               if(i != 0){ //Prediction_*のkeyに突っ込む i:配列の番号,num:Predictionの数
                 eval('cgi_num.Prediction_' + num + '.push(' + i + ');')
@@ -506,29 +477,14 @@
 
         }
 
-    //input用の候補本体をボタンに入力機能を追加
-    /*
-    $('#input_b1').click(function(e) {
-      pushButton(result1,10);
-    });
-    $('#input_b2').click(function(e) {
-      pushButton(result2,20);
-    });
-    $('#input_b3').click(function(e) {
-      pushButton(result3,30);
-    });*/
-
     function putPredition (){
       for(var i=1;i<BUTTON_NUMBER+1;i++){
         for(var j=1;j<PREDICTION_NUMBER+1;j++){
           myEval('$("#input_b' +i+ '_' +j+ '").text(Prediction_' +i+ '[' +j+ ']);')
         }
       }
-        $('.inputbtn').css('display','inline');
-      //}
+      $('.inputbtn').css('display','inline');
     }
-
-
 
     //API送信用のTimeを取得
     function TimerResult(){
@@ -547,7 +503,6 @@
     canvas.addEventListener('mouseleave', function(e){
       mouse.isDrawing = false;
     });
-
 
     //flgからkeyを取ってくる
     function get_key(flg){
@@ -595,10 +550,6 @@
       });
 
     }
-
-
-
-
 
     //ボタン押下後の動作
     /* flgは辞書に押し込むためのFLG
@@ -657,6 +608,7 @@
 
     }
 
+    //特定の文字は文章の続きとして提示する
     $('#input_ga').click(function(e){
       push_particle("が")
     });
@@ -680,12 +632,9 @@
 
     //実行関数
     function myEval(expr){
-      //console.log(expr);
       Function(expr)();
     }
 
   }
-
-
 
 })();
