@@ -1,25 +1,51 @@
 //DBのGUIを追加
 $(function(){
-$('#post_btn').click(function(e) {
-  //name + w1 をpost
-  //console.log($('#name').val());
-  postDB($('#name').val(),$('#w1').val());
-});
 
 $('#get_btn').click(function(e) {
   //nameをpost
   $("#result").text("result : ");
-  console.log("start access DB");
-  $.when(getDB_WP($('#name').val()))
+  $.when(getDB_WP($('#get_key').val()))
   .done(function(data){
     if(data){
       $("#result").append(data);
       TableMaker.make(data);
-      console.log(data);
     }else{
       $("#result").append("no data");
     }
   });
+});
+$('#get_all_btn').click(function(e) {
+  $("#result").text("result : ");
+  $.when(getDB_WP_ALL())
+  .done(function(data){
+    if(data){
+      for(let obj of data){
+        TableMaker.make(obj);
+      }
+    }else{
+      $("#result").append("");
+    }
+  });
+});
+
+$("#clear_btn").click(function(){
+    // ヘッダ以外の全行を削除
+    $('#resultTable').find("tr:gt(0)").remove();
+});
+
+$("#post_btn").click(function(){
+  let Prediction_obj = {
+    Prediction: ""
+  }
+    $.when(getDB_WP($('#post_key').val()))
+      .done(function(data){
+        if(data){
+          Prediction_obj.Prediction = [data.W_key,data.word1,data.word2,data.word3,data.word4,data.word5,data.word6,data.word7,data.word8,data.word9,data.word10];
+        }else{
+          Prediction_obj.Prediction = [$("#post_key").val(),"","","","","","","","","",""];
+        }
+        post_WP($("#post_key").val(),$("#post_word").val(),10,Prediction_obj);
+      })
 });
 });
 
