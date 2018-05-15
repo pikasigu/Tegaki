@@ -14,9 +14,6 @@ getで常にDBから予測候補は取ってあるのでそれを弄って送る
 */
 
 function postDB_WP(send_data){
-    //console.log("post : " + key + word);
-
-    //console.log(send_data);
 
 	// Ajax 通信の実行
 	$.ajax({
@@ -25,10 +22,6 @@ function postDB_WP(send_data){
 		dataType: 	'json',
 		data: send_data,
 		success: function(){	// 通信に成功した場合の処理
-
-			// アラートを出力（値が単一の場合）
-		 //console.log("post success" + send_data);
-
 
 		},
 		complete: function() {	// 通信を終了した場合の処理（成功・失敗問わず）
@@ -46,23 +39,7 @@ function postDB_WP(send_data){
 /* getした配列から辞書が複数になるように...(ry) */
 //よーするに辞書がダブらないように突っ込むためのなんか
 function post_WP(key,word,flg,Prediction_obj){
-  //console.log(Prediction_obj);
-
-  //console.log(key + " : " + word);
-
-  //console.log(key.slice(0,1));
-
-
-  //FLGで条件分岐
-  //key=key,word=入力文字列
-  if(flg >5){ //認識字本体
-    if(key.length != 1){ //文字数が多ければ一文字目をkeyにする
-      postDB_WP(checkDB_WP(key.slice(0,1),word,flg/10,Prediction_obj));
-    } //1文字なら登録無し
-  }else{ //予測候補を選択した場合
-    postDB_WP(checkDB_WP(key.slice(0,1),word,flg,Prediction_obj));
-    //postDB_WP(checkDB_WP(key,word,flg,Prediction_obj));
-  }
+  postDB_WP(checkDB_WP(key.slice(0,1),word,flg,Prediction_obj));
 }
 
 //Prediction_*とダブっていないか確認する
@@ -71,8 +48,8 @@ function post_WP(key,word,flg,Prediction_obj){
 //Prediction_は配列だった...
 //send_dataを返す
 function checkDB_WP(key,word,flg,Prediction_obj){
-
-  //console.log(key + " :: " + word);
+	console.log(key);
+	console.log(word);
 
   //keyに対応するのでここでobjを作る
   //jsondataはobjectがいいらしい
@@ -82,8 +59,6 @@ function checkDB_WP(key,word,flg,Prediction_obj){
 
   //spliceの削除先配列
   var remove;
-
-  //console.log(Prediction_obj);
 
   $.each(Prediction_obj.Prediction, function(i,val){
     if(val === word && i != 0){ //一致する
@@ -102,7 +77,6 @@ function fix_send_data(Prediction,send_data){
   for(var i=1;i<11;i++){
     eval("send_data.word" +i+ " = Prediction[" + i +"];");
   }
-  //console.log(send_data);
 
   return send_data;
 }

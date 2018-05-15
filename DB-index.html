@@ -4,19 +4,37 @@
     <meta charset="UTF-8">
     <title>データベース管理ページ</title>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
-    <script type="text/javascript" src="get.js"></script>
-    <script type="text/javascript" src="post.js"></script>
-    <script type="text/javascript" src="test.js"></script>
+    <script type="text/javascript" src="getWP.js"></script>
+    <script type="text/javascript" src="postWP.js"></script>
+    <script type="text/javascript" src="DB-index.js"></script>
+    <style>
+    table {
+	     border-collapse: collapse;
+    }
+    td {
+	     border: solid 1px;
+	     padding: 0.5em;
+    }
+    </style>
   </head>
 
   <body>
-    <form id="form1" name="form1">
-    <p><input type="text" id="name" value="name"></input></p>
-    <p><input type="text" id="w1" value="w1"></input></p>
-    <p><input type="text" id="get" value="get_word"></input></p>
+    <h2>DBから単語予測を取得</h2>
+    <button id="get_btn">取得</button>
+    <button id="get_all_btn">全件取得</button>
+    <button id="clear_btn">クリア</button>
+    <div id="result">result : </div>
+    <form id="get_form" name="get_form">
+    <p>単語名<input type="text" id="get_key" value=""></input></p>
+    </form>
+    <table id="resultTable"></table>
+
+    <h2>DBに単語を追加</h2>
+    <form id="send_form" name="send_form">
+    <p>引出し語<input type="text" id="post_key" value=""></input></p>
+    <p>予測語<input type="text" id="post_word" value=""></input></p>
     </form>
     <button id="post_btn">送信</button>
-    <button id="get_btn">取得</button>
-    <div id="result">result : </div>
+
   </body>
 </html>
