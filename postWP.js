@@ -47,10 +47,7 @@ function post_WP(key,word,flg,Prediction_obj){
 //flgでPrediction_*を判断
 //Prediction_は配列だった...
 //send_dataを返す
-function checkDB_WP(key,word,flg,Prediction_obj){
-	console.log(key);
-	console.log(word);
-
+function checkDB_WP(key,word,flg,Prediction_obj){ß
   //keyに対応するのでここでobjを作る
   //jsondataはobjectがいいらしい
   var send_data = {
