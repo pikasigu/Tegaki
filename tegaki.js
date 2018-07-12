@@ -30,7 +30,7 @@
       getY: 0,
       x: 0,
       y: 0,
-      color: "blue",
+      color: "black",
       isDrawing: false
     }
     var borderWidth = 1;
@@ -41,7 +41,7 @@
 
 
     var result;
-    var i = 0;
+    var stroke_cnt = 0;
     var Timer = 0;
 
     var oldpost;
@@ -94,8 +94,14 @@
     }
     $('#inputbtns').prepend(inputbtns_text);
 
+    //SP用スクロール防止
+    $(window).on('touchmove.noScroll', function(e) {
+      e.preventDefault();
+    });
+
 
     canvas.addEventListener("mousemove", function(e){
+      e.preventDefault();
       //マウスが動いたら座標値を取得
       var rect = e.target.getBoundingClientRect();
       mouse.x = e.clientX - rect.left - borderWidth;
@@ -107,6 +113,7 @@
         ctx.lineTo(mouse.x, mouse.y);
         ctx.strokeStyle = mouse.color;
         ctx.stroke();
+        ctx.closePath();
         mouse.startX = mouse.x;
         mouse.startY = mouse.y;
         setInterval(getPoint(),20);
@@ -114,15 +121,23 @@
     });
 
     canvas.addEventListener("touchmove", function(e){
+      e.preventDefault();
+      var rect = e.target.getBoundingClientRect();
+      pos.x = e.touches[0].clientX - rect.left - borderWidth;
+      pos.y = e.touches[0].clientY - rect.top - borderWidth;
       //タッチ認識用
-      var post = getPosT(e);
+      //var posT = getPosT(e);
+      //pos.x = posT.x;
+      //pos.y = posT.y;
       if (pos.isDrawing){
         ctx.beginPath();
-        ctx.moveTo(oldpost.x, oldpost.y);
-        ctx.lineTo(post.x, post.y);
+        ctx.moveTo(pos.startX, pos.startY);
+        ctx.lineTo(pos.x, pos.y);
         ctx.strokeStyle = pos.color;
         ctx.stroke();
-        oldpost = post;
+        ctx.closePath();
+        pos.startX = pos.x;
+        pos.startY = pos.y;
         setInterval(getPos(),20);
       }
     });
@@ -132,9 +147,9 @@
     function getPoint(){
       endTime = new Date();
       //inkに突っ込む
-      text.requests[0].ink[i][0].push(mouse.x); //xを突っ込む
-      text.requests[0].ink[i][1].push(mouse.y); //yを突っ込む
-      text.requests[0].ink[i][2].push((endTime - startTime)/1000); //timeを突っ込む
+      text.requests[0].ink[stroke_cnt][0].push(mouse.x); //xを突っ込む
+      text.requests[0].ink[stroke_cnt][1].push(mouse.y); //yを突っ込む
+      text.requests[0].ink[stroke_cnt][2].push((endTime - startTime)/1000); //timeを突っ込む
       mouse.getX = mouse.x;
       mouse.getY = mouse.y;
       //Timer = endTime;
@@ -143,15 +158,21 @@
     function getPos(){
       endTime = new Date();
       //inkに突っ込む
-      text.requests[0].ink[i][0].push(oldpost.x); //xを突っ込む
-      text.requests[0].ink[i][1].push(oldpost.y); //yを突っ込む
-      text.requests[0].ink[i][2].push((endTime - startTime)/1000); //timeを突っ込む
+      text.requests[0].ink[stroke_cnt][0].push(pos.x); //xを突っ込む
+      text.requests[0].ink[stroke_cnt][1].push(pos.y); //yを突っ込む
+      text.requests[0].ink[stroke_cnt][2].push((endTime - startTime)/1000); //timeを突っ込む
+      pos.getX = pos.x;
+      pos.getY = pos.y;
       //Timer = endTime;
     }
 
     //マウスを押したら、描画OK(myDrawをtrue)
     canvas.addEventListener("mousedown", function(e){
+      e.preventDefault();
       startTime = new Date();
+      var rect = e.target.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left - borderWidth;
+      mouse.y = e.clientY - rect.top - borderWidth;
       //Timer = startTime;
       mouse.startX = mouse.x;
       mouse.startY = mouse.y;
@@ -160,45 +181,53 @@
       mouse.getY = mouse.y;
       mouse.isDrawing = true;
       //初期点をinkに突っ込んでおく
-      //iはストローク数
-      text.requests[0].ink[i] = ([[mouse.x],[mouse.y],[0]]);
+      //stroke_cntはストローク数
+      text.requests[0].ink[stroke_cnt] = ([[mouse.x],[mouse.y],[0]]);
     });
 
     //6.マウスを上げたら、描画禁止(myDrawをfalse)
     canvas.addEventListener("mouseup", function(e){
+      e.preventDefault();
       //endTime = new Date();
-      mouse.secondX = mouse.x;
-      mouse.secondY = mouse.y;
       mouse.isDrawing = false;
-      i++;
+      stroke_cnt++;
       //setTimeout(getResult(),3000);
       getResult();
-
     });
+
     canvas.addEventListener("touchstart", function(e){
       e.preventDefault();
       startTime = new Date();
+      var rect = e.target.getBoundingClientRect();
+      pos.x = e.touches[0].clientX - rect.left - borderWidth;
+      pos.y = e.touches[0].clientY - rect.top - borderWidth;
       //Timer = startTime;
-      oldpost = getPosT(e);
-      pos.startX = oldpost.x;
-      pos.startY = oldpost.y;
+      pos.startX = pos.x;
+      pos.startY = pos.y;
       //初期点かつ分岐点
+      pos.getX = pos.x;
+      pos.getY = pos.y;
       pos.isDrawing = true;
-      text.requests[0].ink[i] = ([[oldpost.x],[oldpost.y],[0]]);
+      text.requests[0].ink[stroke_cnt] = ([[pos.x],[pos.y],[0]]);
     });
 
     //マウスを上げたら、描画禁止(myDrawをfalse)
     canvas.addEventListener("touchend", function(e){
-      endTime = new Date();
-      //pos.secondX = pos.x;
-      //pos.secondY = pos.y;
+      e.preventDefault();
+      //endTime = new Date();
       pos.isDrawing = false;
-      i++;
+      stroke_cnt++;
       //setTimeout(getResult(),3000);
       getResult();
     });
 
-
+    function scrollX(){return document.documentElement.scrollLeft || document.body.scrollLeft;}
+    function scrollY(){return document.documentElement.scrollTop || document.body.scrollTop;}
+    function getPosT (event) {
+      var mouseX = event.touches[0].clientX - $(canvas).position().left + scrollX();
+      var mouseY = event.touches[0].clientY - $(canvas).position().top + scrollY();
+      return {x:mouseX, y:mouseY};
+    }
 
     //Buttonが押されるとlineのnumberをflgとしてpushButtonを起こす
     for(var i = 1; i < BUTTON_NUMBER + 1 ;i++){
@@ -230,9 +259,6 @@
     });
 
     new Clipboard('#copybtn');
-
-    function scrollX(){return document.documentElement.scrollLeft || document.body.scrollLeft;}
-    function scrollY(){return document.documentElement.scrollTop || document.body.scrollTop;}
 
     //google手書き認識API
     function getResult(){
@@ -485,12 +511,6 @@
       }
     }
 
-    function getPosT (event) {
-      var mouseX = event.touches[0].clientX - $(canvas).position().left + scrollX();
-      var mouseY = event.touches[0].clientY - $(canvas).position().top + scrollY();
-      return {x:mouseX, y:mouseY};
-    }
-
     canvas.addEventListener('mouseleave', function(e){
       mouse.isDrawing = false;
     });
@@ -572,6 +592,8 @@
 
 
       clear_Prediction();
+
+      stroke_cnt = 0;
 
       get_TextPrediction(word);
 
