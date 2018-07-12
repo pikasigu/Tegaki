@@ -243,7 +243,6 @@
         data : JSON.stringify(text),
         dataType : 'json',
       }).done(function(json) {
-        //console.log(json);
         mode = "WP";
 
         //有力候補を取得する
@@ -252,7 +251,6 @@
           result = json[1][0][1][(i-1)];
           $('#input_b' + i).text(result);
         }
-        //console.log(result1);
 
         $('.particle_btn').css('display','none');
 
@@ -279,7 +277,6 @@
         */
         //keyとnumを受け取って,投げる
         function getPredition (){
-          //console.log(mouse);
           if(pos.isDrawing || mouse.isDrawing){}
           else{
 
@@ -337,10 +334,6 @@
               getDB_pre_txt += ',""';
             }
             getDB_pre_txt += '];}';
-            //getDB_pre_txt += 'console.log(Prediction_1);'
-
-
-
           }
 
           for(var j =1;j<BUTTON_NUMBER+1;j++){
@@ -406,7 +399,6 @@
             CGI(get_key(2)),
             CGI(get_key(3)))
             .done(function(data_1,data_2,data_3){
-              //console.log(cgi_num);
               $.each(cgi_num.Prediction_1,function(i,val){
                 Prediction_1[val] = data_1[0][1][val-1];
               });
@@ -460,7 +452,6 @@
             suggest(get_key(2)),
             suggest(get_key(3)))
             .done(function(data_1,data_2,data_3){
-              //console.log(data_1);
               $.each(cgi_num.Prediction_1,function(i,val){
                 Prediction_1[val] = data_1[1][val-1];
               });
@@ -533,13 +524,11 @@
       $.when(
         getDB_TP(word))
         .done(function(data){
-          //console.log(data);
           if(data){
             T_Prediction = [data.T_key,data.text1,data.text2,data.text3];
           }else{
             T_Prediction = [word,"","",""];
           }
-          //console.log(T_Prediction);
           $('#input_b1_1').text(T_Prediction[1]);
           $('#input_b1_2').text(T_Prediction[2]);
           $('#input_b1_3').text(T_Prediction[3]);
@@ -565,13 +554,10 @@
 
       //文字を入力
       $("#input").append(word);
-      //console.log(Prediction_obj);
-
 
       $.when(
         getDB_WP(get_key(flg).slice(0,1)))
         .done(function(data){
-          //console.log(data);
           //false処理を書く
           if(data){
             Prediction_obj.Prediction = [data.W_key,data.word1,data.word2,data.word3,data.word4,data.word5,data.word6,data.word7,data.word8,data.word9,data.word10];
@@ -587,7 +573,6 @@
 
       clear_Prediction();
 
-      //console.log(word);
       get_TextPrediction(word);
 
       if(Old_key != ""){
