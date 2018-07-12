@@ -20,17 +20,20 @@ function postDB_WP(send_data){
 	});
 }
 
-/* getした配列から辞書が複数になるように...(ry) */
-function post_WP(key,word,flg,Prediction_obj){
-  postDB_WP(checkDB_WP(key.slice(0,1),word,flg,Prediction_obj));
+function post_WP(key,word,Prediction_obj){
+	if(word.length != 1){
+		for(var i = 0;i<word.length-1;i++){
+			postDB_WP(checkDB_WP(word.slice(0,i+1),word,Prediction_obj));
+			console.log(word.slice(0,i+1));
+		}
+	}
 }
 
 //Prediction_*とダブっていないか確認する
 //ダブっていたらsend_dataの入れ方を変える
-//flgでPrediction_*を判断
 //Prediction_は配列だった...
 //send_dataを返す
-function checkDB_WP(key,word,flg,Prediction_obj){
+function checkDB_WP(key,word,Prediction_obj){
   //keyに対応するのでここでobjを作る
   //jsondataはobjectがいいらしい
   var send_data = {
@@ -57,6 +60,5 @@ function fix_send_data(Prediction,send_data){
   for(var i=1;i<11;i++){
     eval("send_data.word" +i+ " = Prediction[" + i +"];");
   }
-
   return send_data;
 }

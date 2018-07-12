@@ -565,7 +565,7 @@
             Prediction_obj.Prediction = [get_key(flg).slice(0,1),"","","","","","","","","",""];
           }
           if(mode == "WP"){
-            post_WP(get_key(flg),word,flg,Prediction_obj);
+            post_WP(get_key(flg),word,Prediction_obj);
             mode = "TP";
           }
         });
