@@ -1,6 +1,7 @@
 <?php
 /*
 DBからWPを引っ張り出して,予測候補を返す
+GUI用
 */
 
 //ヘッダーの設定
@@ -9,9 +10,9 @@ DBからWPを引っ張り出して,予測候補を返す
 
 //DB処理を突っ込む
 //DB接続情報
-$dsn = 'mysql:host=localhost;dbname=Tegaki;charset=utf8';
-$username = 'root';
-$password = 'yuyusama';
+$dsn = 'mysql:host=localhost;dbname=pikachi_tegaki;charset=utf8';
+$username = 'pikachi_user';
+$password = 'pikachi_user';
 //DBから取り出す
 try{
   //PDOインスタンス生成
