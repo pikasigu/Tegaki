@@ -19,9 +19,9 @@ $data = array(
 
 //DB処理を突っ込む
 //DB接続情報
-$dsn = 'mysql:host=localhost;dbname=pikachi_tegaki;charset=utf8';
-$username = 'pikachi_user';
-$password = 'pikachi_user';
+$dsn = 'mysql:host=mysql131.phy.lolipop.lan;dbname=LAA0977378-tegaki;charset=utf8';
+$username = 'LAA0977378';
+$password = 'yuyusama1675';
 //DBに入れる
 try{
   //PDOインスタンス生成

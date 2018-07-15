@@ -8,7 +8,8 @@
       return false;
     }
     var ctx = canvas.getContext('2d');
-    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 3;
 
     //マウスの座標を取得
     var mouse = {
@@ -82,17 +83,21 @@
       myEval("var result" + i + ";");
     }
 
+    add_btn();
+
     //htmlにボタンを追加
-    var inputbtns_text = '';
-    for(var i = 1; i < BUTTON_NUMBER + 1; i++){
-      inputbtns_text += '<div>';
-      inputbtns_text += '<button class="inputbtn ' +  'bline' + i + '" id="input_b' + i + '"></button>'
-      for(var  j = 1; j < PREDICTION_NUMBER + 1; j++){
-        inputbtns_text += '<button class="inputbtn ' +  'bline' + i + '" id="input_b' + i + '_' + j + '"></button>'
+    function add_btn(){
+      var inputbtns_text = '';
+      for(var i = 1; i < BUTTON_NUMBER + 1; i++){
+        inputbtns_text += '<div>';
+        inputbtns_text += '<button class="inputbtn ' +  'bline' + i + '" id="input_b' + i + '"></button>'
+        for(var  j = 1; j < PREDICTION_NUMBER + 1; j++){
+          inputbtns_text += '<button class="inputbtn ' +  'bline' + i + '" id="input_b' + i + '_' + j + '"></button>'
+        }
+        inputbtns_text += '</div>'
       }
-      inputbtns_text += '</div>'
+      $('#inputbtns').prepend(inputbtns_text);
     }
-    $('#inputbtns').prepend(inputbtns_text);
 
     //SP用スクロール防止
     $(window).on('touchmove.noScroll', function(e) {
@@ -262,6 +267,8 @@
 
     //google手書き認識API
     function getResult(){
+      $('.inputbtn').remove();
+      add_btn();
       $.ajax({
         url : 'https://inputtools.google.com/request?itc=ja-t-i0-handwrit',
         method : 'POST',
@@ -527,8 +534,10 @@
     }
 
     function clear_Prediction(){
-      $('.inputbtn').css('display','none');
-      $('.inputbtn').text("");
+      //$('.inputbtn').css('display','none');
+      //$('.inputbtn').text("");
+      $('.inputbtn').remove();
+      add_btn();
       text.requests[0].ink = [];
       ctx.clearRect(0,0,canvas.width,canvas.height);
     }

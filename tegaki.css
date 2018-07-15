@@ -1,4 +1,8 @@
 .inputbtn {
+  -webkit-animation-name: slideimage;
+  animation-name: slideimage;
+  -webkit-animation-duration: 1.0s;
+  animation-duration: 1.0s;
   font-size: 1.0em;
   font-weight: bold;
   margin: 10px;
@@ -58,7 +62,9 @@
 
 
 #clear{
-  font-size: 2.0em;
+  position:absolute;
+  text-align: center;
+  font-size: 1.0em;
   font-weight: bold;
   margin: 5px;
   text-align: center;
@@ -94,4 +100,26 @@ body{
     width:100%;
     margin-right: auto;
     margin-left : auto;
+}
+
+@-webkit-keyframes slideimage {
+  0% {
+    position: absolute;
+    left: -100vw;
+  }
+  100% {
+    position: relative;
+    left: 0;
+  }
+}
+
+@keyframes slideimage {
+  from {
+    position: absolute;
+    left: -100vw;
+  }
+  to {
+    position: relative;
+    left: 0;
+  }
 }
